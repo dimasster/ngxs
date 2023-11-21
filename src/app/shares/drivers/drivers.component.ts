@@ -1,9 +1,7 @@
 import { Component } from '@angular/core';
 import { DriversService } from './drivers.service';
-import { Select } from '@ngxs/store';
-import { DriversState } from './drivers.state';
-import { Observable } from 'rxjs';
 import { Driver } from './driver.model';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-drivers',
@@ -11,6 +9,18 @@ import { Driver } from './driver.model';
   styleUrls: ['./drivers.component.css']
 })
 export class DriversComponent {
-  @Select(DriversState) trips$!: Observable<Driver[]> 
+  drivers: Driver[] = []
+
+  private destroy = new Subject<void>();
+
   constructor(private stateService: DriversService){}
+
+  ngOnInit(){
+    this.stateService.driversSub.pipe(takeUntil(this.destroy)).subscribe(drivers => this.drivers = drivers);
+  }
+
+  ngOnDestroy(){
+    this.destroy.next();
+    this.destroy.complete();
+  }
 }

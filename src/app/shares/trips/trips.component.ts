@@ -1,9 +1,7 @@
 import { Component } from '@angular/core';
 import { TripsService } from './trips.service';
-import { Select } from '@ngxs/store';
-import { TripsState } from './trips.state';
-import { Observable } from 'rxjs';
 import { Trip } from './trip.model';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-trips',
@@ -11,6 +9,19 @@ import { Trip } from './trip.model';
   styleUrls: ['./trips.component.css']
 })
 export class TripComponent {
-  @Select(TripsState) trips$!: Observable<Trip[]> 
+  trips: Trip[] = []
+
+  private destroy = new Subject<void>();
+
   constructor(private stateService: TripsService){}
+
+  ngOnInit(){
+    this.stateService.tripsSub.pipe(takeUntil(this.destroy)).subscribe(trips => this.trips = trips);
+  }
+
+  ngOnDestroy(){
+    this.destroy.next();
+    this.destroy.complete();
+  }
+  
 }

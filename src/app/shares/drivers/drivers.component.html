@@ -1,1 +1,6 @@
-<p>drivers works!</p>
+<div ngClass="drivers-list">
+    <div ngClass="driver" *ngFor="let driver of drivers">
+        <p>{{driver.id}}</p>
+        <p>{{driver.name}}</p>
+    </div>
+</div>
